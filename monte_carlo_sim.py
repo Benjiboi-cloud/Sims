@@ -183,7 +183,7 @@ else:
 
         # Plot histogram of the final compounded return values in percentages
         fig, ax = plt.subplots()
-        ax.hist(final_values_percent, bins=100, edgecolor='black', alpha=0.7)
+        ax.hist(final_values_percent, bins=200, edgecolor='black', alpha=0.7)
         ax.set_title(f'Histogram of Compounded Portfolio Returns ({num_simulations} simulations)')
         ax.set_xlabel('Compounded Return (%)')
         ax.set_ylabel('Frequency')
@@ -191,7 +191,7 @@ else:
 
         # Plot histogram of the ending capitals
         fig, ax = plt.subplots()
-        ax.hist(ending_capitals, bins=100, edgecolor='black', alpha=0.7)
+        ax.hist(ending_capitals, bins=200, edgecolor='black', alpha=0.7)
         ax.set_title(f'Histogram of Ending Capitals ({num_simulations} simulations)')
         ax.set_xlabel('Ending Capital')
         ax.set_ylabel('Frequency')
