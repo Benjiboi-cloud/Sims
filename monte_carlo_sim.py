@@ -118,7 +118,11 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     }
 
     # Convert DataFrame to display rounded values using formatting
-    stats_df = pd.DataFrame(stats_data).style.format(precision=2)
+    stats_df = pd.DataFrame(stats_data).style.format({
+        'Compounded Return (%)': '{:.2f}',
+        'Annualized Return (%)': '{:.2f}',
+        'Ending Capital': '{:,.2f}'  # This will add commas to the 'Ending Capital' column
+    })
 
     # Display the table with rounded values
     st.dataframe(stats_df)
@@ -130,13 +134,12 @@ st.title('Portfolio Simulation: S&P 500 and T.Bond')
 df = pd.read_csv(csv_file_path)
 
 # Input widgets for number of years, simulations, starting capital, and portfolio weights
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=1000)
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
 start_capital = st.number_input('Starting capital', min_value=1, value=10000)
 sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
 tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
-        simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight)
-
+    simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight)
