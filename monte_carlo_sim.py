@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Define the file path to your CSV file
-csv_file_path = 'C:/Users/benja/OneDrive/Desktop/Kelly Sheets/Historical returns.csv'
+csv_file_path = 'C:/Users/benja/OneDrive/Desktop/Kelly Sheets/git/Historical returns.csv'
 
 def simulate_sp500_compounded_returns(df, num_years, num_simulations):
     # Clean the 'S&P 500 (includes dividends)' column by removing '%' and converting to floats
