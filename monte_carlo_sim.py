@@ -22,9 +22,12 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
 
     # Run the simulations
     for _ in range(num_simulations):
-        # Randomly sample returns for the defined number of years for both S&P and T.Bonds
-        sampled_sp500_returns = np.random.choice(sp500_returns, size=num_years, replace=True)
-        sampled_tbond_returns = np.random.choice(tbond_returns, size=num_years, replace=True)
+        # Randomly sample indices for the defined number of years (same index for both S&P and T.Bonds)
+        sampled_indices = np.random.choice(len(sp500_returns), size=num_years, replace=True)
+        
+        # Use the sampled indices to select the corresponding returns for both S&P 500 and T.Bonds
+        sampled_sp500_returns = sp500_returns[sampled_indices]
+        sampled_tbond_returns = tbond_returns[sampled_indices]
 
         # Compute portfolio return: S&P weight * S&P return + T.Bond weight * T.Bond return
         portfolio_returns = sp_weight * sampled_sp500_returns + tbond_weight * sampled_tbond_returns
@@ -114,10 +117,11 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
                            median_ending_capital, percentile_25_capital, percentile_10_capital, percentile_5_capital]
     }
 
-    stats_df = pd.DataFrame(stats_data)
+    # Convert DataFrame to display rounded values using formatting
+    stats_df = pd.DataFrame(stats_data).style.format(precision=2)
 
-    # Display the table
-    st.table(stats_df)
+    # Display the table with rounded values
+    st.dataframe(stats_df)
 
 # Streamlit app
 st.title('Portfolio Simulation: S&P 500 and T.Bond')
@@ -126,12 +130,13 @@ st.title('Portfolio Simulation: S&P 500 and T.Bond')
 df = pd.read_csv(csv_file_path)
 
 # Input widgets for number of years, simulations, starting capital, and portfolio weights
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=1000)
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
 start_capital = st.number_input('Starting capital', min_value=1, value=10000)
 sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
 tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
-    simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight)
+        simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight)
+
