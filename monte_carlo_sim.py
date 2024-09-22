@@ -16,7 +16,7 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
         tbond_col = 'US T. Bond'
 
     # The 3-month T.Bill return will always be non-inflation adjusted
-    tbill_col = '3-Month T.Bill'
+    tbill_col = '3-month T.Bill'
 
     # Clean the selected columns by removing '%' and converting to floats
     df[sp500_col] = df[sp500_col].str.replace('%', '').astype(float) / 100
