@@ -6,7 +6,7 @@ import streamlit as st
 # Reference the CSV file relative to the app.py file in the repository
 csv_file_path = 'Historical returns.csv'
 
-def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted):
+def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis):
     # Select columns based on user preference for inflation-adjusted returns
     if use_inflation_adjusted:
         sp500_col = 'S&P 500 (includes dividends) inflation adjusted'
@@ -14,14 +14,19 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     else:
         sp500_col = 'S&P 500 (includes dividends)'
         tbond_col = 'US T. Bond'
-    
+
+    # The 3-month T.Bill return will always be non-inflation adjusted
+    tbill_col = '3 Month T.Bill'
+
     # Clean the selected columns by removing '%' and converting to floats
     df[sp500_col] = df[sp500_col].str.replace('%', '').astype(float) / 100
     df[tbond_col] = df[tbond_col].str.replace('%', '').astype(float) / 100
+    df[tbill_col] = df[tbill_col].str.replace('%', '').astype(float) / 100
 
-    # Extract the selected S&P 500 and T.Bond returns
+    # Extract the selected S&P 500, T.Bond, and 3-month T.Bill returns
     sp500_returns = df[sp500_col].values
     tbond_returns = df[tbond_col].values
+    tbill_returns = df[tbill_col].values
 
     # Initialize lists to store final compounded return values, annualized returns, and ending capitals
     final_values = []
@@ -33,12 +38,21 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
         # Randomly sample indices for the defined number of years (same index for both S&P and T.Bonds)
         sampled_indices = np.random.choice(len(sp500_returns), size=num_years, replace=True)
         
-        # Use the sampled indices to select the corresponding returns for both S&P 500 and T.Bonds
+        # Use the sampled indices to select the corresponding returns for both S&P 500, T.Bonds, and 3-month T.Bill
         sampled_sp500_returns = sp500_returns[sampled_indices]
         sampled_tbond_returns = tbond_returns[sampled_indices]
+        sampled_tbill_returns = tbill_returns[sampled_indices]
 
         # Compute portfolio return: S&P weight * S&P return + T.Bond weight * T.Bond return
         portfolio_returns = sp_weight * sampled_sp500_returns + tbond_weight * sampled_tbond_returns
+
+        # Calculate total allocation and check if it's above 1
+        total_allocation = sp_weight + tbond_weight
+        if total_allocation > 1:
+            # Apply the negative return for the excess allocation with interest basis
+            excess_allocation = total_allocation - 1
+            interest_cost = excess_allocation * (sampled_tbill_returns + interest_basis) * -1
+            portfolio_returns += interest_cost
 
         # Compute compounded portfolio return: (1 + return1) * (1 + return2) * ... - 1
         compounded_return = np.prod(1 + portfolio_returns) - 1
@@ -144,14 +158,15 @@ df = pd.read_csv(csv_file_path)
 # Checkbox to choose inflation-adjusted returns
 use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=False)
 
-# Input widgets for number of years, simulations, starting capital, and portfolio weights
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=1000)
-start_capital = st.number_input('Starting capital', min_value=1, value=100000)
-sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.7)
-tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.3)
+# Input widgets for number of years, simulations, starting capital, portfolio weights, and interest basis
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
+start_capital = st.number_input('Starting capital', min_value=1, value=10000)
+sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
+tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
+interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_value=-1.0, max_value=1.0, value=0.0)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
-        simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted)
+    simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis)
 
