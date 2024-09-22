@@ -144,7 +144,7 @@ use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=Fal
 num_years = st.number_input('Number of years to simulate', min_value=1, max_value=1000, value=30)
 num_simulations = st.number_input('Number of simulations', min_value=1, max_value=100000, value=10000)
 start_capital = st.number_input('Starting capital', min_value=1, value=10000)
-interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_value=-1.0, max_value=1.0, value=0.0)
+interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_value=-1.0, max_value=1.0, value=0.0, step =0.001)
 
 # Optimization toggle
 optimize = st.checkbox('Optimize for best 25th percentile')
