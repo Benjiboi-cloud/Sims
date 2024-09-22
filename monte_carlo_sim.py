@@ -145,11 +145,11 @@ df = pd.read_csv(csv_file_path)
 use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=False)
 
 # Input widgets for number of years, simulations, starting capital, and portfolio weights
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
-start_capital = st.number_input('Starting capital', min_value=1, value=10000)
-sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
-tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=1000)
+start_capital = st.number_input('Starting capital', min_value=1, value=100000)
+sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.7)
+tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.3)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
