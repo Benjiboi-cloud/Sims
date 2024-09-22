@@ -151,13 +151,13 @@ optimize = st.checkbox('Optimize for best 25th percentile')
 
 if optimize:
     # Define ranges for S&P and T.Bond weights
-    sp_weight_min = st.number_input('S&P 500 Weight Min', min_value=0.0, max_value=1.0, value=0.0)
-    sp_weight_max = st.number_input('S&P 500 Weight Max', min_value=0.0, max_value=1.0, value=1.0)
-    sp_weight_step = st.number_input('S&P 500 Weight Step', min_value=0.01, max_value=1.0, value=0.1)
+    sp_weight_min = st.number_input('S&P 500 Weight Min', min_value=0.0, max_value=5.0, value=0.0)
+    sp_weight_max = st.number_input('S&P 500 Weight Max', min_value=0.0, max_value=5.0, value=1.0)
+    sp_weight_step = st.number_input('S&P 500 Weight Step', min_value=0.01, max_value=5.0, value=0.1)
     
-    tbond_weight_min = st.number_input('T.Bond Weight Min', min_value=0.0, max_value=1.0, value=0.0)
-    tbond_weight_max = st.number_input('T.Bond Weight Max', min_value=0.0, max_value=1.0, value=1.0)
-    tbond_weight_step = st.number_input('T.Bond Weight Step', min_value=0.01, max_value=1.0, value=0.1)
+    tbond_weight_min = st.number_input('T.Bond Weight Min', min_value=0.0, max_value=5.0, value=0.0)
+    tbond_weight_max = st.number_input('T.Bond Weight Max', min_value=0.0, max_value=5.0, value=1.0)
+    tbond_weight_step = st.number_input('T.Bond Weight Step', min_value=0.01, max_value=5.0, value=0.1)
 
     sp_weight_range = np.arange(sp_weight_min, sp_weight_max + sp_weight_step, sp_weight_step)
     tbond_weight_range = np.arange(tbond_weight_min, tbond_weight_max + tbond_weight_step, tbond_weight_step)
@@ -170,8 +170,8 @@ if optimize:
         st.write(f"Optimal T.Bond Weight: {best_tbond_weight}")
 else:
     # Input widgets for S&P and T.Bond weights
-    sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=1.0, value=0.7)
-    tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=1.0, value=0.3)
+    sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=5.0, value=0.7)
+    tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=5.0, value=0.3)
 
     # Run the simulation when the button is clicked
     if st.button('Run Simulation'):
