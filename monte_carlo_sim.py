@@ -11,12 +11,14 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     if use_inflation_adjusted:
         sp500_col = 'S&P 500 (includes dividends) inflation adjusted'
         tbond_col = 'US T. Bond inflation adjusted'
+        tbill_col = '3-month T.Bill inflation adjusted'
     else:
         sp500_col = 'S&P 500 (includes dividends)'
         tbond_col = 'US T. Bond'
+        tbill_col = '3-month T.Bill'
 
     # The 3-month T.Bill return will always be non-inflation adjusted
-    tbill_col = '3-month T.Bill'
+    
 
     # Clean the selected columns by removing '%' and converting to floats
     df[sp500_col] = df[sp500_col].str.replace('%', '').astype(float) / 100
