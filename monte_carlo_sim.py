@@ -28,9 +28,8 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     tbond_returns = df[tbond_col].values
     tbill_returns = df[tbill_col].values
 
-    # Initialize lists to store final compounded return values, annualized returns, and ending capitals
+    # Initialize lists to store final compounded return values and ending capitals
     final_values = []
-    annualized_returns = []
     ending_capitals = []
 
     # Run the simulations
@@ -58,17 +57,12 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
         compounded_return = np.prod(1 + portfolio_returns) - 1
         final_values.append(compounded_return)
 
-        # Compute the annualized return using the specified formula
-        annualized_return = (1 + compounded_return) ** (1 / num_years) - 1
-        annualized_returns.append(annualized_return)
-
         # Compute the ending capital
         ending_capital = start_capital * (1 + compounded_return)
         ending_capitals.append(ending_capital)
 
-    # Convert final compounded returns and annualized returns to percentages for analysis and plotting
+    # Convert final compounded returns to percentages for analysis and plotting
     final_values_percent = np.round(np.array(final_values) * 100, 2)
-    annualized_returns_percent = np.round(np.array(annualized_returns) * 100, 2)
     ending_capitals = np.round(np.array(ending_capitals), 2)
 
     # Plot histogram of the final compounded return values in percentages
@@ -76,14 +70,6 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     ax.hist(final_values_percent, bins=30, edgecolor='black', alpha=0.7)
     ax.set_title(f'Histogram of Compounded Portfolio Returns ({num_simulations} simulations)')
     ax.set_xlabel('Compounded Return (%)')
-    ax.set_ylabel('Frequency')
-    st.pyplot(fig)
-
-    # Plot histogram of the annualized return values in percentages
-    fig, ax = plt.subplots()
-    ax.hist(annualized_returns_percent, bins=30, edgecolor='black', alpha=0.7)
-    ax.set_title(f'Histogram of Annualized Portfolio Returns ({num_simulations} simulations)')
-    ax.set_xlabel('Annualized Return (%)')
     ax.set_ylabel('Frequency')
     st.pyplot(fig)
 
@@ -105,17 +91,15 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
     percentile_5 = round(np.percentile(final_values_percent, 5), 2)
     percentile_95 = round(np.percentile(final_values_percent, 95), 2)
 
-    # Calculate the annualized return based on the median compounded return
-    median_annual_return = round(((1 + (median_return / 100)) ** (1 / num_years) - 1) * 100, 2)
-
-    # Calculate percentiles and statistics for annualized returns
-    avg_annual_return = round(np.mean(annualized_returns_percent), 2)
-    percentile_25_annual = round(np.percentile(annualized_returns_percent, 25), 2)
-    percentile_75_annual = round(np.percentile(annualized_returns_percent, 75), 2)
-    percentile_10_annual = round(np.percentile(annualized_returns_percent, 10), 2)
-    percentile_90_annual = round(np.percentile(annualized_returns_percent, 90), 2)
-    percentile_5_annual = round(np.percentile(annualized_returns_percent, 5), 2)
-    percentile_95_annual = round(np.percentile(annualized_returns_percent, 95), 2)
+    # Calculate annualized returns based on the compounded returns for each percentile
+    avg_annual_return = round(((avg_return / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    median_annual_return = round(((median_return / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_25_annual = round(((percentile_25 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_75_annual = round(((percentile_75 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_10_annual = round(((percentile_10 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_90_annual = round(((percentile_90 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_5_annual = round(((percentile_5 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_95_annual = round(((percentile_95 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
 
     # Calculate percentiles and statistics for ending capital
     avg_ending_capital = round(np.mean(ending_capitals), 2)
@@ -169,3 +153,4 @@ interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_va
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
     simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis)
+
