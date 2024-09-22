@@ -6,14 +6,22 @@ import streamlit as st
 # Reference the CSV file relative to the app.py file in the repository
 csv_file_path = 'Historical returns.csv'
 
-def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight):
-    # Clean the 'S&P 500 (includes dividends)' and 'US T. Bond' columns by removing '%' and converting to floats
-    df['S&P 500 (includes dividends)'] = df['S&P 500 (includes dividends)'].str.replace('%', '').astype(float) / 100
-    df['US T. Bond'] = df['US T. Bond'].str.replace('%', '').astype(float) / 100
+def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted):
+    # Select columns based on user preference for inflation-adjusted returns
+    if use_inflation_adjusted:
+        sp500_col = 'S&P 500 (includes dividends) inflation adjusted'
+        tbond_col = 'US T. Bond inflation adjusted'
+    else:
+        sp500_col = 'S&P 500 (includes dividends)'
+        tbond_col = 'US T. Bond'
+    
+    # Clean the selected columns by removing '%' and converting to floats
+    df[sp500_col] = df[sp500_col].str.replace('%', '').astype(float) / 100
+    df[tbond_col] = df[tbond_col].str.replace('%', '').astype(float) / 100
 
-    # Extract the S&P 500 and T.Bond returns
-    sp500_returns = df['S&P 500 (includes dividends)'].values
-    tbond_returns = df['US T. Bond'].values
+    # Extract the selected S&P 500 and T.Bond returns
+    sp500_returns = df[sp500_col].values
+    tbond_returns = df[tbond_col].values
 
     # Initialize lists to store final compounded return values, annualized returns, and ending capitals
     final_values = []
@@ -133,13 +141,17 @@ st.title('Portfolio Simulation: S&P 500 and T.Bond')
 # Load the CSV file into a DataFrame
 df = pd.read_csv(csv_file_path)
 
+# Checkbox to choose inflation-adjusted returns
+use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=False)
+
 # Input widgets for number of years, simulations, starting capital, and portfolio weights
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=1000)
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
 start_capital = st.number_input('Starting capital', min_value=1, value=10000)
 sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
 tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
-    simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight)
+        simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted)
+
