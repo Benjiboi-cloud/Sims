@@ -16,7 +16,7 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
         tbond_col = 'US T. Bond'
 
     # The 3-month T.Bill return will always be non-inflation adjusted
-    tbill_col = '3-month T.Bill'
+    tbill_col = '3 Month T.Bill'
 
     # Clean the selected columns by removing '%' and converting to floats
     df[sp500_col] = df[sp500_col].str.replace('%', '').astype(float) / 100
@@ -58,7 +58,7 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
         compounded_return = np.prod(1 + portfolio_returns) - 1
         final_values.append(compounded_return)
 
-        # Compute the annualized return
+        # Compute the annualized return using the specified formula
         annualized_return = (1 + compounded_return) ** (1 / num_years) - 1
         annualized_returns.append(annualized_return)
 
@@ -159,14 +159,13 @@ df = pd.read_csv(csv_file_path)
 use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=False)
 
 # Input widgets for number of years, simulations, starting capital, portfolio weights, and interest basis
-num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=30)
-num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=10000)
+num_years = st.number_input('Number of years to simulate', min_value=1, max_value=100, value=10)
+num_simulations = st.number_input('Number of simulations', min_value=1, max_value=10000, value=100)
 start_capital = st.number_input('Starting capital', min_value=1, value=10000)
-sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.7)
-tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.3)
-interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_value=-1.0, max_value=1.0, value=0.005)
+sp_weight = st.number_input('S&P 500 Weight', min_value=0.0, max_value=10.0, value=0.6)
+tbond_weight = st.number_input('T.Bond Weight', min_value=0.0, max_value=10.0, value=0.4)
+interest_basis = st.number_input('Interest basis (added to T-bill rate)', min_value=-1.0, max_value=1.0, value=0.0)
 
 # Run the simulation when the button is clicked
 if st.button('Run Simulation'):
     simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis)
-
