@@ -66,9 +66,54 @@ def simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp
 
     # Calculate percentiles and statistics for compounded returns
     avg_return = round(np.mean(final_values_percent), 2)
+    median_return = round(np.median(final_values_percent), 2)
     percentile_25 = round(np.percentile(final_values_percent, 25), 2)
-    
-    return percentile_25, avg_return, final_values_percent, ending_capitals
+    percentile_75 = round(np.percentile(final_values_percent, 75), 2)
+    percentile_10 = round(np.percentile(final_values_percent, 10), 2)
+    percentile_90 = round(np.percentile(final_values_percent, 90), 2)
+    percentile_5 = round(np.percentile(final_values_percent, 5), 2)
+    percentile_95 = round(np.percentile(final_values_percent, 95), 2)
+
+    # Calculate annualized returns based on the compounded returns for each percentile
+    avg_annual_return = round(((avg_return / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    median_annual_return = round(((median_return / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_25_annual = round(((percentile_25 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_75_annual = round(((percentile_75 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_10_annual = round(((percentile_10 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_90_annual = round(((percentile_90 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_5_annual = round(((percentile_5 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+    percentile_95_annual = round(((percentile_95 / 100) + 1) ** (1 / num_years) - 1, 4) * 100
+
+    # Calculate percentiles and statistics for ending capital
+    avg_ending_capital = round(np.mean(ending_capitals), 2)
+    median_ending_capital = round(np.median(ending_capitals), 2)
+    percentile_25_capital = round(np.percentile(ending_capitals, 25), 2)
+    percentile_75_capital = round(np.percentile(ending_capitals, 75), 2)
+    percentile_10_capital = round(np.percentile(ending_capitals, 10), 2)
+    percentile_90_capital = round(np.percentile(ending_capitals, 90), 2)
+    percentile_5_capital = round(np.percentile(ending_capitals, 5), 2)
+    percentile_95_capital = round(np.percentile(ending_capitals, 95), 2)
+
+    # Create a DataFrame to display in a table
+    stats_data = {
+        'Metric': ['95th Percentile', '90th Percentile', '75th Percentile', 'Average Return', 
+                   'Median Return', '25th Percentile', '10th Percentile', '5th Percentile'],
+        'Compounded Return (%)': [percentile_95, percentile_90, percentile_75, avg_return, 
+                                  median_return, percentile_25, percentile_10, percentile_5],
+        'Annualized Return (%)': [percentile_95_annual, percentile_90_annual, percentile_75_annual, avg_annual_return, 
+                                  median_annual_return, percentile_25_annual, percentile_10_annual, percentile_5_annual],
+        'Ending Capital': [percentile_95_capital, percentile_90_capital, percentile_75_capital, avg_ending_capital, 
+                           median_ending_capital, percentile_25_capital, percentile_10_capital, percentile_5_capital]
+    }
+
+    # Convert DataFrame to display rounded values using formatting
+    stats_df = pd.DataFrame(stats_data).style.format({
+        'Compounded Return (%)': '{:.2f}',
+        'Annualized Return (%)': '{:.2f}',
+        'Ending Capital': '{:,.2f}'  # This will add commas to the 'Ending Capital' column
+    })
+
+    return stats_df, final_values_percent, ending_capitals
 
 def optimize_portfolio(df, num_years, num_simulations, start_capital, use_inflation_adjusted, interest_basis, sp_weight_range, tbond_weight_range):
     best_25th_percentile = -np.inf
@@ -93,7 +138,6 @@ st.title('Portfolio Simulation: S&P 500 and T.Bond')
 # Load the CSV file into a DataFrame
 df = pd.read_csv(csv_file_path)
 
-# Checkbox to choose inflation-adjusted returns
 use_inflation_adjusted = st.checkbox("Use inflation-adjusted returns", value=False)
 
 # Input widgets for number of years, simulations, starting capital, portfolio weights, and interest basis
@@ -131,11 +175,11 @@ else:
 
     # Run the simulation when the button is clicked
     if st.button('Run Simulation'):
-        percentile_25, avg_return, final_values_percent, ending_capitals = simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis)
+        stats_df, final_values_percent, ending_capitals = simulate_portfolio_returns(df, num_years, num_simulations, start_capital, sp_weight, tbond_weight, use_inflation_adjusted, interest_basis)
 
-        # Display simulation results
-        st.write(f"25th Percentile Return: {percentile_25}%")
-        st.write(f"Average Return: {avg_return}%")
+        # Display the results table
+        st.write("Simulation Results:")
+        st.dataframe(stats_df)
 
         # Plot histogram of the final compounded return values in percentages
         fig, ax = plt.subplots()
